@@ -1,0 +1,54 @@
+<!-- Generated template for the AutocompleteComponent component -->
+<div class="header">
+
+  <input #input placeholder="What are you searching for?">
+
+  <div class="cog" (click)="showModal()">
+    <ion-icon name="cog"></ion-icon>
+  </div>
+
+  <div class="modal">
+    <div class="modal-content">
+      <ion-list>
+        <ion-item>
+          <ion-label>Results count</ion-label>
+          <ion-select #s (ionChange)="setResultsCount(s.value)">
+            <ion-option value="1" [selected]="true">1</ion-option>
+            <ion-option value="2">2</ion-option>
+            <ion-option value="3">3</ion-option>
+            <ion-option value="4">4</ion-option>
+            <ion-option value="5">5</ion-option>
+            <ion-option value="6">6</ion-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+
+  <div id="suggestions">
+    <div class="suggestion-item"
+         *ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">
+      {{x.name}}
+    </div>
+  </div>
+
+
+</div>
+
+
+<div class="main">
+
+  <div class="flex-container">
+    <div class="flex-item" *ngFor="let y of chosenElements">
+      <div class="product-label">
+        {{y.name}}
+      </div>
+      <button class="delete-button" (click)="removeChosenElement(y)">X</button>
+    </div>
+  </div>
+
+  <button *ngIf="isLocationEnabled" ion-button large style="position: fixed; bottom: 16px; right: 16px;"
+          (click)="passChosenElements()">Search
+  </button>
+
+</div>
