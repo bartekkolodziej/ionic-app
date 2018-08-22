@@ -23,8 +23,7 @@ export class SearchPage {
     {name: 'Cheese', keyword: 'convenience+store grocery', type: 'grocery_or_supermarket'},
     {name: 'Meat', keyword: 'convenience+store grocery', type: 'grocery_or_supermarket'},
     {name: 'Sweets', keyword: 'convenience+store grocery', type: 'grocery_or_supermarket'},
-    {name: 'Sweets', keyword: 'convenience+store grocery', type: 'grocery_or_supermarket'},
-    {name: 'Mouthwash', keyword: 'pharmacy drug+store'},
+    {name: 'Mouthwash', keyword: 'pharmay drugstore'},
     {name: 'Restaurant', keyword: 'restaurant', type: 'restaurant'},
     {name: 'Pancakes', keyword: 'pancakes'},
     {name: 'Waffles', keyword: 'waffles'},
@@ -143,7 +142,8 @@ export class SearchPage {
     this.chosenElements = this.chosenElements.filter(el => el !== element)
   }
 
-  passChosenElements() {
+  searchForPlaces() {
+    this.closeModal();
     this.navController.push(HomePage, {
       chosenElements: this.chosenElements,
       resultsCount: this.resultsCount,

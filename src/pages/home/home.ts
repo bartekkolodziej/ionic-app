@@ -16,9 +16,10 @@ export class HomePage implements OnInit {
   map;
   placesService: google.maps.places.PlacesService;
 
-  currentPosition = {lat: 0, lng: 0};
+  currentPosition;
   currentPositionMarker: google.maps.Marker;
 
+  infoWindows: google.maps.InfoWindow[] = [];
   markers: google.maps.Marker[] = [];
   numberOfCompletedRequests: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
@@ -34,6 +35,7 @@ export class HomePage implements OnInit {
     this.currentPosition = this.navParams.get('currentPosition');
     this.initMap();
     this.getPlacesAndMarkers();
+   // this.allPlacesNearby();
   }
 
   initMap() {
@@ -41,10 +43,13 @@ export class HomePage implements OnInit {
       center: this.currentPosition,
       zoom: 16
     });
-    console.log(this.currentPosition);
+
+    google.maps.event.addListener(this.map, 'click', () => {
+      for(let x of this.infoWindows)
+        x.close();
+    });
 
     this.geolocation.watchPosition().subscribe(data => {
-      console.log(this.currentPosition);
       this.currentPosition.lat = data.coords.latitude;
       this.currentPosition.lng = data.coords.longitude;
       this.currentPositionMarker.setPosition(this.currentPosition);
@@ -80,8 +85,7 @@ export class HomePage implements OnInit {
           location: this.currentPosition,
           rankBy: google.maps.places.RankBy.DISTANCE,
           type: x.type
-        }, (res, status) => {
-          console.log(res)
+        }, res => {
           let tmp = res.slice(0, resultsCount);
           numberOfFoundElements = tmp.length;
           this.updatePlaces(tmp, x);
@@ -95,7 +99,8 @@ export class HomePage implements OnInit {
         location: this.currentPosition,
         rankBy: google.maps.places.RankBy.DISTANCE,
         keyword: x.keyword
-      }, (res, status) => {
+      }, res => {
+
         let tmp = res.slice(0, resultsCount - numberOfFoundElements);
         this.updatePlaces(tmp, x);
         this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1);
@@ -104,8 +109,7 @@ export class HomePage implements OnInit {
   }
 
   allPlacesNearby() {
-    this.http.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyDf2Khi4ZJabH0DUR6bfe1S7kjeBm6rhYw&location=50.073391,20.002397&radius=50`)
-      .subscribe(res => console.log(res));
+    this.placesService.nearbySearch({location: {lat:50.063699, lng:19.932971}, radius: 50}, res => console.log(res))
   }
 
   updatePlaces(slicedResponse, chosenEl) {
@@ -158,6 +162,7 @@ export class HomePage implements OnInit {
       let infoWindow = new google.maps.InfoWindow({
         content: content
       });
+      this.infoWindows.push(infoWindow);
       marker.addListener('click', () => infoWindow.open(this.map, marker));
       this.markers.push(marker)
     }
