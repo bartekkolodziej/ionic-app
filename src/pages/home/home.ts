@@ -23,18 +23,21 @@ export class HomePage implements OnInit {
   markers: google.maps.Marker[] = [];
   numberOfCompletedRequests: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  chosenElements: { name: string, keyword: string, type: string }[] = [];
+  chosenElements: { name: string, keyword: string, storeType: string, poiType: string }[] = [];
   places: { place: any, products: string }[];
+  resultsType: string;
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private http: HttpClient, private geolocation: Geolocation) {
     this.places = [];
+    this.resultsType = navParams.get('resultsType');
   }
 
   ngOnInit(): void {
     this.chosenElements = this.navParams.get('chosenElements');
     this.currentPosition = this.navParams.get('currentPosition');
     this.initMap();
-    this.getPlacesAndMarkers();
+    this.getMarkers();
+    this.searchForPlaces(this.navParams.get('resultsCount'));
    // this.allPlacesNearby();
   }
 
@@ -56,12 +59,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  getPlacesAndMarkers() {
-    //init places service
-    this.placesService = new google.maps.places.PlacesService(this.map);
-
-    this.searchForPlaces(this.navParams.get('resultsCount'));
-
+  getMarkers() {
     //set custom pos marker and open its info window
     this.currentPositionMarker = new google.maps.Marker({position: this.currentPosition, map: this.map});
     let infoWindow = new google.maps.InfoWindow({content: 'Here you are'});
@@ -77,35 +75,43 @@ export class HomePage implements OnInit {
   }
 
   searchForPlaces(resultsCount = 1) {
-    let numberOfFoundElements = 0;
+    this.placesService = new google.maps.places.PlacesService(this.map);
+
     //search by type, if didnt found all places search by keyword
     for (let x of this.chosenElements) {
-      if (x.type) {
-        this.placesService.nearbySearch({
-          location: this.currentPosition,
-          rankBy: google.maps.places.RankBy.DISTANCE,
-          type: x.type
-        }, res => {
-          let tmp = res.slice(0, resultsCount);
-          numberOfFoundElements = tmp.length;
-          this.updatePlaces(tmp, x);
-        });
-      }
-
-      if (resultsCount - numberOfFoundElements === 0)
-        return;
-
-      this.placesService.nearbySearch({
-        location: this.currentPosition,
-        rankBy: google.maps.places.RankBy.DISTANCE,
-        keyword: x.keyword
-      }, res => {
-
-        let tmp = res.slice(0, resultsCount - numberOfFoundElements);
-        this.updatePlaces(tmp, x);
-        this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1);
-      });
+      if (x[this.resultsType]) {
+        this.searchByType(resultsCount, x)
+      }else
+        this.searchByText(resultsCount, x);
     }
+  }
+
+  searchByType(resultsCount: number, el){
+    this.placesService.nearbySearch({
+      location: this.currentPosition,
+      rankBy: google.maps.places.RankBy.DISTANCE,
+      type: el[this.resultsType]
+    }, res => {
+      let tmp = res.slice(0, resultsCount);
+      this.updatePlaces(tmp, el);
+      if(resultsCount - tmp.length !== 0)
+        this.searchByText(resultsCount - tmp.length, el)
+      else
+        this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1) //this statement indicates that searching for product is completed
+    });
+  }
+
+  searchByText(resultsCount: number,el){
+    this.placesService.nearbySearch({
+      location: this.currentPosition,
+      rankBy: google.maps.places.RankBy.DISTANCE,
+      keyword: el.keyword
+    }, res => {
+      console.log(res)
+      let tmp = res.slice(0, resultsCount);
+      this.updatePlaces(tmp, el);
+      this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1) //this statement indicates that searching for product is completed
+    });
   }
 
   allPlacesNearby() {

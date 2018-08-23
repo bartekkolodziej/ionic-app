@@ -1,18 +1,20 @@
 <!-- Generated template for the AutocompleteComponent component -->
 <div class="header">
-
+  <div class="search-icon">
+    <ion-icon name="search"></ion-icon>
+  </div>
   <input #input placeholder="What are you searching for?">
 
-  <div class="cog" (click)="showModal()">
+  <div class="cog" (click)="showSettings()">
     <ion-icon name="settings"></ion-icon>
   </div>
 
-  <div class="modal">
+  <div class="modal" id="settingsModal">
     <div class="modal-content">
       <ion-list>
         <ion-item>
           <ion-label>Results count</ion-label>
-          <ion-select #s (ionChange)="setResultsCount(s.value)">
+          <ion-select #s [(ngModel)]="resultsCount">
             <ion-option value="1" [selected]="true">1</ion-option>
             <ion-option value="2">2</ion-option>
             <ion-option value="3">3</ion-option>
@@ -36,6 +38,15 @@
           </ion-select>
         </ion-item>
       </ion-list>
+      <ion-list>
+        <ion-item>
+          <ion-label>Results type</ion-label>
+          <ion-select #t [(ngModel)]="resultsType">
+            <ion-option value="storeType" [selected]="true">Store</ion-option>
+            <ion-option value="poiType">Point of interest</ion-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
     </div>
   </div>
 
@@ -46,14 +57,13 @@
     </div>
   </div>
 
-
 </div>
 
 
 <div class="main">
 
   <div class="flex-container">
-    <div class="flex-item" *ngFor="let y of chosenElements">
+    <div class="flex-item" *ngFor="let y of listToShow.products">
       <div class="product-label">
         {{y.name}}
       </div>
@@ -61,8 +71,37 @@
     </div>
   </div>
 
-  <button *ngIf="isLocationEnabled" ion-button large style="position: fixed; bottom: 16px; right: 16px;"
+  <button *ngIf="isLocationEnabled" class="search-button"
           (click)="searchForPlaces()">Search
   </button>
 
+  <button class="addlist-button" (click)="showAddlistModal()">Add list</button>
+  <button class="deletelist-button" (click)="showDeletelistModal()" *ngIf="selectedList !== ''">Delete list</button>
+
+  <div class="modal" id="addlistModal">
+    <div class="modal-content">
+      <ion-item>
+        <ion-input type="text" value="" placeholder="Name" #list></ion-input>
+      </ion-item>
+      <button class="add-button" (click)="addNewList(list.value)">Add</button>
+    </div>
+  </div>
+
+  <div class="modal" id="deletelistModal">
+    <div class="modal-content">
+      <h2>Delete current list?</h2>
+      <button class="confirm-button" (click)="deleteList()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <ion-list style="margin:0">
+    <ion-item style="background-color: #f5f5f5">
+      <ion-label>My lists</ion-label>
+      <ion-select [(ngModel)]="selectedList" #sel (ionChange)="selectList(sel.value)">
+        <ion-option *ngFor="let i of lists">{{i.name}}</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
 </div>
