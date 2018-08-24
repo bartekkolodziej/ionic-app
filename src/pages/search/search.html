@@ -1,8 +1,4 @@
-<!-- Generated template for the AutocompleteComponent component -->
 <div class="header">
-  <div class="search-icon">
-    <ion-icon name="search"></ion-icon>
-  </div>
   <input #input placeholder="What are you searching for?">
 
   <div class="cog" (click)="showSettings()">
@@ -49,27 +45,37 @@
       </ion-list>
     </div>
   </div>
-
-  <div id="suggestions">
-    <div class="suggestion-item"
-         *ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">
-      {{x.name}}
-    </div>
-  </div>
-
 </div>
 
+<div id="suggestions">
+  <div class="suggestion-item"
+       *ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">
+    {{x.name}}
+  </div>
+</div>
 
 <div class="main">
 
-  <div class="flex-container">
-    <div class="flex-item" *ngFor="let y of listToShow.products">
-      <div class="product-label">
-        {{y.name}}
-      </div>
-      <button class="delete-button" (click)="removeChosenElement(y)">X</button>
-    </div>
-  </div>
+  <ion-list style="z-index:1 !important;">
+
+    <ion-item *ngFor="let y of activeProducts">
+      <input type="checkbox" item-start style="margin-right: 24px;" (change)="setState($event, y.name)">
+      <h2>{{y.name}}</h2>
+      <p *ngIf="y.note">{{y.note}}</p>
+      <p item-end *ngIf="y.price" style="margin-right:32px">Price: <span>{{y.price}}</span></p>
+      <button ion-button clear item-end (click)="showProductDetailsModal(y, y.note, y.price)">Edit</button>
+    </ion-item>
+
+    <ion-item *ngFor="let x of inactiveProducts">
+      <input type="checkbox" item-start style="margin-right: 24px;" checked="true" (change)="setState($event, x.name)">
+      <h2>
+        <del>{{x.name}}</del>
+      </h2>
+      <p *ngIf="x.note">{{x.note}}</p>
+      <p item-end *ngIf="x.price" style="margin-right:32px">Price: <span>{{x.price}}</span></p>
+    </ion-item>
+
+  </ion-list>
 
   <button *ngIf="isLocationEnabled" class="search-button"
           (click)="searchForPlaces()">Search
@@ -105,3 +111,6 @@
     </ion-item>
   </ion-list>
 </div>
+
+
+

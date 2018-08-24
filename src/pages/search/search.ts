@@ -1,8 +1,10 @@
 import {Component, HostListener} from '@angular/core';
-import {IonicPage, NavController, NavParams, PopoverController} from 'ionic-angular';
+import {IonicPage, ModalController, NavController, NavParams, PopoverController} from 'ionic-angular';
 import {HomePage} from "../home/home";
 import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from '@ionic-native/diagnostic';
+import {Storage} from '@ionic/storage';
+import {ProductDetailsPage} from "../product-details/product-details";
 
 
 /**
@@ -65,37 +67,23 @@ export class SearchPage {
   addlistModal;
   deletelistModal;
   input;
-  lists: {name: string, products: any[]}[];
-  selectedList: string = '';
-  listToShow;
+  lists: { name: string, products: any[] }[] = [];
+  selectedList: string = 'Default'; //only for displaying, it may be deleted later
+  activeProducts = [];
+  inactiveProducts = [];
 
-  constructor(public navController: NavController, private geolocation: Geolocation, private diagnostic: Diagnostic) {
-    JSON.parse(localStorage.getItem('lists')) === null ? this.lists = [{name:'', products:[]}] : this.lists = JSON.parse(localStorage.getItem('lists'));
-    this.listToShow = this.lists.find(el => el.name === this.selectedList)
-  }
-
-  showSettings() {
-    this.settingsModal.style.display = "block";
-  }
-
-  closeSettings() {
-    this.settingsModal.style.display = "none";
-  }
-
-  showAddlistModal() {
-    this.addlistModal.style.display = 'block'
-  }
-
-  closeAddlistModal(){
-    this.addlistModal.style.display = "none";
-  }
-
-  showDeletelistModal() {
-    this.deletelistModal.style.display = 'block'
-  }
-
-  closeDeletelistModal(){
-    this.deletelistModal.style.display = "none";
+  constructor(public navController: NavController,
+              private geolocation: Geolocation,
+              private diagnostic: Diagnostic,
+              private storage: Storage,
+              public modalCtrl: ModalController
+  ) {
+    this.storage.get('lists').then(val => {
+      if (val !== null)
+        this.lists = val;
+      this.lists.push({name: 'Default', products: []});
+      this.activeProducts = this.lists.find(el => el.name === 'Default').products
+    });
   }
 
   ngOnInit(): void {
@@ -111,9 +99,25 @@ export class SearchPage {
       this.toggleSuggestions(true)
     });
 
-
     this.getPosition();
     //this.diagnostic.isLocationEnabled().then(() => this.getPosition())
+  }
+
+  showProductDetailsModal(el, note, price) {
+    let modal = this.modalCtrl.create(ProductDetailsPage, {
+      name: el.name,
+      note: note ? note : '',
+      price: price ? price : ''
+    });
+    modal.onDidDismiss(data => {
+      if (data) {
+        console.log(this.activeProducts)
+        let product = this.activeProducts.find(el => el.name === data.name);
+        product.note = data.note;
+        product.price = data.price;
+      }
+    });
+    modal.present();
   }
 
 
@@ -136,7 +140,10 @@ export class SearchPage {
         }
       }
       if (!isFound)
-        this.lists.find(el => el.name === this.selectedList).products.push({name: event.target.value, keyword: event.target.value});
+        this.lists.find(el => el.name === this.selectedList).products.push({
+          name: event.target.value,
+          keyword: event.target.value
+        });
 
       this.input.value = '';
       this.toggleSuggestions();
@@ -177,30 +184,72 @@ export class SearchPage {
   }
 
   addNewList(val) {
-    this.lists.push({name:val, products:[]});
+    this.lists.push({name: val, products: []});
     this.selectedList = val;
     this.closeAddlistModal();
-    this.listToShow = this.lists.find(el => el.name === this.selectedList);
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
   }
 
   deleteList() {
     this.lists = this.lists.filter(el => el.name !== this.selectedList);
-    this.selectedList = '';
+    this.selectedList = 'Default';
     this.closeDeletelistModal();
   }
 
   selectList(val) {
-    if(val === '')
-
     this.selectedList = val;
-    this.listToShow = this.lists.find(el => el.name === this.selectedList);
-    console.log(this.lists)
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
+  }
+
+  showSettings() {
+    this.settingsModal.style.display = "block";
+  }
+
+  closeSettings() {
+    this.settingsModal.style.display = "none";
+  }
+
+  showAddlistModal() {
+    this.addlistModal.style.display = 'block'
+  }
+
+  closeAddlistModal() {
+    this.addlistModal.style.display = "none";
+  }
+
+  showDeletelistModal() {
+    this.deletelistModal.style.display = 'block'
+  }
+
+  closeDeletelistModal() {
+    this.deletelistModal.style.display = "none";
   }
 
   @HostListener('window:beforeunload', ['$event'])
-  beforeunloadHandler(event) {
-    this.lists.find(el => el.name === '').products = [];
-    localStorage.setItem('lists', JSON.stringify(this.lists));
+  beforeunloadHandler() {
+    this.lists = this.lists.filter(el => el.name !== 'Default');
+    this.storage.set('lists', this.lists);
+  }
+
+
+  setState(event, name) {
+    if (event.target.checked === true) {
+      for (let i = 0; i < this.activeProducts.length; i++) {
+        if (this.activeProducts[i].name === name) {
+          this.inactiveProducts.push(this.activeProducts[i]);
+          this.activeProducts.splice(i, 1);
+          break;
+        }
+      }
+    } else {
+      for (let i = 0; i < this.inactiveProducts.length; i++) {
+        if (this.inactiveProducts[i].name === name) {
+          this.activeProducts.push(this.inactiveProducts[i]);
+          this.inactiveProducts.splice(i, 1);
+          break;
+        }
+      }
+    }
   }
 
 }
