@@ -1,0 +1,115 @@
+<div class="header">
+  <input #input placeholder="What are you searching for?">
+
+  <div class="cog" (click)="showSettings()">
+    <ion-icon name="settings"></ion-icon>
+  </div>
+
+  <div class="modal" id="settingsModal">
+    <div class="modal-content">
+      <ion-list>
+        <ion-item>
+          <ion-label>Results count</ion-label>
+          <ion-select #s [(ngModel)]="resultsCount">
+            <ion-option value="1" [selected]="true">1</ion-option>
+            <ion-option value="2">2</ion-option>
+            <ion-option value="3">3</ion-option>
+            <ion-option value="4">4</ion-option>
+            <ion-option value="5">5</ion-option>
+            <ion-option value="6">6</ion-option>
+            <ion-option value="7">7</ion-option>
+            <ion-option value="8">8</ion-option>
+            <ion-option value="9">9</ion-option>
+            <ion-option value="10">10</ion-option>
+            <ion-option value="11">11</ion-option>
+            <ion-option value="12">12</ion-option>
+            <ion-option value="13">13</ion-option>
+            <ion-option value="14">14</ion-option>
+            <ion-option value="15">15</ion-option>
+            <ion-option value="16">16</ion-option>
+            <ion-option value="17">17</ion-option>
+            <ion-option value="18">18</ion-option>
+            <ion-option value="19">19</ion-option>
+            <ion-option value="20">20</ion-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      <ion-list>
+        <ion-item>
+          <ion-label>Results type</ion-label>
+          <ion-select #t [(ngModel)]="resultsType">
+            <ion-option value="storeType" [selected]="true">Store</ion-option>
+            <ion-option value="poiType">Point of interest</ion-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</div>
+
+<div id="suggestions">
+  <div class="suggestion-item"
+       *ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">
+    {{x.name}}
+  </div>
+</div>
+
+<div class="main">
+
+  <ion-list style="z-index:1 !important;">
+
+    <ion-item *ngFor="let y of activeProducts">
+      <input type="checkbox" item-start style="margin-right: 24px;" (change)="setState($event, y.name)">
+      <h2>{{y.name}}</h2>
+      <p *ngIf="y.note">{{y.note}}</p>
+      <p item-end *ngIf="y.price" style="margin-right:32px">Price: <span>{{y.price}}</span></p>
+      <button ion-button clear item-end (click)="showProductDetailsModal(y, y.note, y.price)">Edit</button>
+    </ion-item>
+
+    <ion-item *ngFor="let x of inactiveProducts">
+      <input type="checkbox" item-start style="margin-right: 24px;" checked="true" (change)="setState($event, x.name)">
+      <h2>
+        <del>{{x.name}}</del>
+      </h2>
+      <p *ngIf="x.note">{{x.note}}</p>
+      <p item-end *ngIf="x.price" style="margin-right:32px">Price: <span>{{x.price}}</span></p>
+    </ion-item>
+
+  </ion-list>
+
+  <button *ngIf="isLocationEnabled" class="search-button"
+          (click)="searchForPlaces()">Search
+  </button>
+
+  <button class="addlist-button" (click)="showAddlistModal()">Add list</button>
+  <button class="deletelist-button" (click)="showDeletelistModal()" *ngIf="selectedList !== ''">Delete list</button>
+
+  <div class="modal" id="addlistModal">
+    <div class="modal-content">
+      <ion-item>
+        <ion-input type="text" value="" placeholder="Name" #list></ion-input>
+      </ion-item>
+      <button class="add-button" (click)="addNewList(list.value)">Add</button>
+    </div>
+  </div>
+
+  <div class="modal" id="deletelistModal">
+    <div class="modal-content">
+      <h2>Delete current list?</h2>
+      <button class="confirm-button" (click)="deleteList()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <ion-list style="margin:0">
+    <ion-item style="background-color: #f5f5f5">
+      <ion-label>My lists</ion-label>
+      <ion-select [(ngModel)]="selectedList" #sel (ionChange)="selectList(sel.value)">
+        <ion-option *ngFor="let i of lists">{{i.name}}</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</div>
+
+
