@@ -6,7 +6,6 @@ import {Diagnostic} from '@ionic-native/diagnostic';
 import {Storage} from '@ionic/storage';
 import {ProductDetailsPage} from "../product-details/product-details";
 
-
 /**
  * Generated class for the SearchPage page.
  *
@@ -98,7 +97,6 @@ export class SearchPage {
       if (event.target == this.deletelistModal) this.deletelistModal.style.display = "none";
       this.toggleSuggestions(true)
     });
-
     this.getPosition();
     //this.diagnostic.isLocationEnabled().then(() => this.getPosition())
   }
@@ -119,7 +117,6 @@ export class SearchPage {
     });
     modal.present();
   }
-
 
   getPosition() {
     this.isLocationEnabled = true;
