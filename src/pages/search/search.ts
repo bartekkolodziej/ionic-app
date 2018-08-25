@@ -70,7 +70,7 @@ export class SearchPage {
   selectedList: string = 'Default'; //only for displaying, it may be deleted later
   activeProducts = [];
   inactiveProducts = [];
-  currentPrice  = 0;
+  currentPrice = 0;
 
   constructor(public navController: NavController,
               private geolocation: Geolocation,
@@ -130,23 +130,9 @@ export class SearchPage {
       this.showSuggestions();
   }
 
-  showSuggestions() {
-    this.toggleSuggestions();
-    this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
-  }
-
-  toggleSuggestions(turnOff = false) {
-    let suggestions = document.getElementById('suggestions');
-    if (this.searchInput.value === '' || turnOff === true)
-      suggestions.style.display = 'none';
-    else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
-      suggestions.style.display = 'block'
-  }
-
   chooseElement(element) {
     if (this.activeProducts.indexOf(element) > -1 || this.inactiveProducts.indexOf(element) > -1)
       return;
-
     this.lists.find(el => el.name === this.selectedList).products.push(element);
     this.searchInput.value = '';
   }
@@ -182,29 +168,6 @@ export class SearchPage {
     this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
   }
 
-  showAddlistModal() {
-    this.addlistModal.style.display = 'block'
-  }
-
-  closeAddlistModal() {
-    this.addlistModal.style.display = "none";
-  }
-
-  showDeletelistModal() {
-    this.deletelistModal.style.display = 'block'
-  }
-
-  closeDeletelistModal() {
-    this.deletelistModal.style.display = "none";
-  }
-
-  @HostListener('window:beforeunload', ['$event'])
-  beforeunloadHandler() {
-    this.lists = this.lists.filter(el => el.name !== 'Default');
-    this.storage.set('lists', this.lists);
-  }
-
-
   setProductState(event, name) {
     if (event.target.checked === true) {
       for (let i = 0; i < this.activeProducts.length; i++) {
@@ -223,6 +186,19 @@ export class SearchPage {
         }
       }
     }
+    this.calcCurrentPrice();
+  }
+
+  calcCurrentPrice(){
+    if(this.activeProducts.length === 0)
+      return this.currentPrice = 0;
+    if(this.activeProducts.length === 1)
+      return this.activeProducts[0].price ? this.currentPrice = this.activeProducts[0].price : this.currentPrice = 0;
+
+    this.currentPrice = this.activeProducts.reduce((a, b) => {
+      if(!b.price) b.price = 0;
+      return a + Number(b.price);
+    }, 0);
   }
 
   showProductDetailsModal(el, note, price) {
@@ -236,6 +212,7 @@ export class SearchPage {
         let product = this.activeProducts.find(el => el.name === data.name);
         product.note = data.note;
         product.price = data.price;
+        this.calcCurrentPrice();
       }
     });
     modal.present();
@@ -248,10 +225,46 @@ export class SearchPage {
     });
     modal.onDidDismiss(data => {
       if (data) {
-       this.resultsType = data.resultsType,
-         this.resultsCount = data.resultsCount
+        this.resultsType = data.resultsType,
+          this.resultsCount = data.resultsCount
       }
     });
     modal.present();
+  }
+
+  showAddlistModal() {
+    this.addlistModal.style.display = 'block'
+  }
+
+  closeAddlistModal() {
+    this.addlistModal.style.display = "none";
+  }
+
+  showDeletelistModal() {
+    this.deletelistModal.style.display = 'block'
+  }
+
+  closeDeletelistModal() {
+    this.deletelistModal.style.display = "none";
+  }
+
+  showSuggestions() {
+    this.toggleSuggestions();
+    this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
+  }
+
+  toggleSuggestions(turnOff = false) {
+    let suggestions = document.getElementById('suggestions');
+    if (this.searchInput.value === '' || turnOff === true)
+      suggestions.style.display = 'none';
+    else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
+      suggestions.style.display = 'block'
+  }
+
+
+  @HostListener('window:beforeunload', ['$event'])
+  beforeunloadHandler() {
+    this.lists = this.lists.filter(el => el.name !== 'Default');
+    this.storage.set('lists', this.lists);
   }
 }
