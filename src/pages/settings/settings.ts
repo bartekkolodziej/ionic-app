@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {IonicPage, NavController, NavParams, ViewController} from 'ionic-angular';
 
 /**
- * Generated class for the ProductDetailsPage page.
+ * Generated class for the SettingsPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
@@ -10,29 +10,28 @@ import {IonicPage, NavController, NavParams, ViewController} from 'ionic-angular
 
 @IonicPage()
 @Component({
-  selector: 'page-product-details',
-  templateUrl: 'product-details.html',
+  selector: 'page-settings',
+  templateUrl: 'settings.html',
 })
-export class ProductDetailsPage {
+export class SettingsPage {
 
-  name:string;
-  price:string;
-  note:string;
+  resultsCount: number;
+  resultsType: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController) {
-    this.name = this.navParams.get('name');
-    this.price = this.navParams.get('price');
-    this.note = this.navParams.get('note');
+    this.resultsCount = this.navParams.get('resultsCount');
+    this.resultsType = this.navParams.get('resultsType');
   }
 
-  ionViewDidLoad() {
-  }
 
   cancel(){
     this.navCtrl.pop({});
   }
   save(){
-    this.viewCtrl.dismiss({name:this.name, price: this.price, note: this.note});
+    this.viewCtrl.dismiss({
+      resultsCount: this.resultsCount,
+      resultsType: this.resultsType
+    });
   }
 
 }

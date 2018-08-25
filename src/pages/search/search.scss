@@ -1,15 +1,83 @@
 page-search {
+  .cb-container {
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default checkbox */
+  .cb-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  /* Create a custom checkbox */
+  .checkmark {
+    position: absolute;
+    top: -7px;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #ffffff;
+    border: 1px solid #adadad;
+    border-radius: 4px;
+  }
+
+  /* When the checkbox is checked, add a blue background */
+  .cb-container input:checked ~ .checkmark {
+    background-color: #536dfe;
+  }
+
+  /* Create the checkmark/indicator (hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the checkmark when checked */
+  .cb-container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the checkmark/indicator */
+  .cb-container .checkmark:after {
+    left: 9px;
+    top: 5px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+
+  .sl-input {
+    color:white;
+    width: 85%;
+    padding: 8px;
+    background-color: #4b4b7e;
+    border: 1px solid #4b4b7e;
+    border-radius: 4px;
+    display:flex;
+  }
 
   .header input {
     color:white;
-    width: 80%;
-    padding: 8px;
+    width: 90%;
+    border:none;
     background-color: #4b4b7e;
-    float: left;
-    border: 1px solid #4b4b7e;
-    border-radius: 4px;
-    margin-left: 8px;
   }
+
 
   .modal {
     display: none; /* Hidden by default */
@@ -26,18 +94,21 @@ page-search {
 
   .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* 50% from the top and centered */
+    margin: 30% auto; /* 50% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
     border-radius: 5px;
   }
 
+  .search-icon{
+    width: 10%;
+  }
+
   .cog {
     color: white;
     text-align: center;
-    width: 10%;
-    float: right;
+    width: 15%;
     padding: 8px;
   }
 
@@ -47,6 +118,8 @@ page-search {
     position: fixed;
     top: 0;
     background-color: #292961;
+    display:flex;
+    z-index:5;
   }
 
   .footer {
@@ -79,19 +152,8 @@ page-search {
     border-bottom: 1px solid #dfdfdf
   }
 
-  .flex-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-  }
-  .flex-container .flex-item:last-of-type {
+  .product-list ion-item:last-of-type {
     margin-bottom: 128px;
-  }
-
-  .flex-item {
-    text-align: center;
-    align-self: stretch;
-    margin: 8px 16px 8px 16px;
   }
 
   .delete-button {
@@ -103,10 +165,23 @@ page-search {
     width: 15%;
   }
 
-  .search-button {
+  .buttons{
     position: fixed;
-    bottom: 64px;
-    right: 16px;
+    bottom: 48px;
+    width: 100%;
+  }
+
+  .cost{
+    position: fixed;
+    bottom: 128px;
+
+  }
+
+  .buttons ion-col{
+    text-align:center
+  }
+
+  .search-button {
     background-color: #488aff;
     padding: 12px 20px;
     color: white;
@@ -114,9 +189,6 @@ page-search {
   }
 
   .addlist-button {
-    position: fixed;
-    bottom: 64px;
-    left: 16px;
     background-color: #28a745;
     padding: 12px 20px;
     color: white;
@@ -124,9 +196,6 @@ page-search {
   }
 
   .deletelist-button {
-    position: fixed;
-    bottom: 64px;
-    left: 128px;
     background-color: #e2413e;
     padding: 12px 20px;
     color: white;

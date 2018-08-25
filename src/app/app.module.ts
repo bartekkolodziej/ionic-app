@@ -12,6 +12,7 @@ import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from "@ionic-native/diagnostic";
 import {IonicStorageModule} from '@ionic/storage';
 import {ProductDetailsPage} from "../pages/product-details/product-details";
+import {SettingsPage} from "../pages/settings/settings";
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import {ProductDetailsPage} from "../pages/product-details/product-details";
     MyApp,
     HomePage,
     SearchPage,
-    ProductDetailsPage
+    ProductDetailsPage,
+    SettingsPage
   ],
   imports: [
     BrowserModule,
@@ -32,7 +34,8 @@ import {ProductDetailsPage} from "../pages/product-details/product-details";
     MyApp,
     HomePage,
     SearchPage,
-    ProductDetailsPage
+    ProductDetailsPage,
+    SettingsPage
   ],
   providers: [
     StatusBar,

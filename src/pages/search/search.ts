@@ -5,6 +5,7 @@ import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from '@ionic-native/diagnostic';
 import {Storage} from '@ionic/storage';
 import {ProductDetailsPage} from "../product-details/product-details";
+import {SettingsPage} from "../settings/settings";
 
 /**
  * Generated class for the SearchPage page.
@@ -62,14 +63,14 @@ export class SearchPage {
   resultsType = 'storeType';
   currentPosition = {lat: 0, lng: 0};
   isLocationEnabled = false; //To change
-  settingsModal;
   addlistModal;
   deletelistModal;
-  input;
+  searchInput;
   lists: { name: string, products: any[] }[] = [];
   selectedList: string = 'Default'; //only for displaying, it may be deleted later
   activeProducts = [];
   inactiveProducts = [];
+  currentPrice  = 0;
 
   constructor(public navController: NavController,
               private geolocation: Geolocation,
@@ -86,36 +87,17 @@ export class SearchPage {
   }
 
   ngOnInit(): void {
-    this.settingsModal = document.getElementById('settingsModal');
     this.addlistModal = document.getElementById('addlistModal');
     this.deletelistModal = document.getElementById('deletelistModal');
-    this.input = document.getElementsByTagName('input')[0];
-    this.input.addEventListener('keyup', e => this.keyUpHandler(e));
+    this.searchInput = document.getElementById('searchInput');
+    this.searchInput.addEventListener('keyup', e => this.keyUpHandler(e));
     document.addEventListener('click', event => {
-      if (event.target == this.settingsModal) this.settingsModal.style.display = "none";
       if (event.target == this.addlistModal) this.addlistModal.style.display = "none";
       if (event.target == this.deletelistModal) this.deletelistModal.style.display = "none";
       this.toggleSuggestions(true)
     });
     this.getPosition();
     //this.diagnostic.isLocationEnabled().then(() => this.getPosition())
-  }
-
-  showProductDetailsModal(el, note, price) {
-    let modal = this.modalCtrl.create(ProductDetailsPage, {
-      name: el.name,
-      note: note ? note : '',
-      price: price ? price : ''
-    });
-    modal.onDidDismiss(data => {
-      if (data) {
-        console.log(this.activeProducts)
-        let product = this.activeProducts.find(el => el.name === data.name);
-        product.note = data.note;
-        product.price = data.price;
-      }
-    });
-    modal.present();
   }
 
   getPosition() {
@@ -131,18 +113,18 @@ export class SearchPage {
       let isFound = false;
       for (let x of this.content) {
         if (x.name.search(new RegExp(event.target.value, 'i')) !== -1) {
-          this.lists.find(el => el.name === this.selectedList).products.push(x);
+          this.chooseElement(x);
           isFound = true;
           break;
         }
       }
       if (!isFound)
-        this.lists.find(el => el.name === this.selectedList).products.push({
+        this.chooseElement({
           name: event.target.value,
           keyword: event.target.value
         });
 
-      this.input.value = '';
+      this.searchInput.value = '';
       this.toggleSuggestions();
     } else
       this.showSuggestions();
@@ -150,20 +132,23 @@ export class SearchPage {
 
   showSuggestions() {
     this.toggleSuggestions();
-    this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.input.value, 'i')) !== -1);
+    this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
   }
 
   toggleSuggestions(turnOff = false) {
     let suggestions = document.getElementById('suggestions');
-    if (this.input.value === '' || turnOff === true)
+    if (this.searchInput.value === '' || turnOff === true)
       suggestions.style.display = 'none';
-    else if (suggestions.style.display === 'none' && this.input.value !== '')
+    else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
       suggestions.style.display = 'block'
   }
 
   chooseElement(element) {
+    if (this.activeProducts.indexOf(element) > -1 || this.inactiveProducts.indexOf(element) > -1)
+      return;
+
     this.lists.find(el => el.name === this.selectedList).products.push(element);
-    this.input.value = '';
+    this.searchInput.value = '';
   }
 
   removeChosenElement(element) {
@@ -171,7 +156,6 @@ export class SearchPage {
   }
 
   searchForPlaces() {
-    this.closeSettings();
     this.navController.push(HomePage, {
       chosenElements: this.lists.find(el => el.name === this.selectedList).products,
       resultsCount: this.resultsCount,
@@ -198,14 +182,6 @@ export class SearchPage {
     this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
   }
 
-  showSettings() {
-    this.settingsModal.style.display = "block";
-  }
-
-  closeSettings() {
-    this.settingsModal.style.display = "none";
-  }
-
   showAddlistModal() {
     this.addlistModal.style.display = 'block'
   }
@@ -229,7 +205,7 @@ export class SearchPage {
   }
 
 
-  setState(event, name) {
+  setProductState(event, name) {
     if (event.target.checked === true) {
       for (let i = 0; i < this.activeProducts.length; i++) {
         if (this.activeProducts[i].name === name) {
@@ -249,4 +225,33 @@ export class SearchPage {
     }
   }
 
+  showProductDetailsModal(el, note, price) {
+    let modal = this.modalCtrl.create(ProductDetailsPage, {
+      name: el.name,
+      note: note ? note : '',
+      price: price ? price : ''
+    });
+    modal.onDidDismiss(data => {
+      if (data) {
+        let product = this.activeProducts.find(el => el.name === data.name);
+        product.note = data.note;
+        product.price = data.price;
+      }
+    });
+    modal.present();
+  }
+
+  showSettingsModal() {
+    let modal = this.modalCtrl.create(SettingsPage, {
+      resultsCount: this.resultsCount,
+      resultsType: this.resultsType
+    });
+    modal.onDidDismiss(data => {
+      if (data) {
+       this.resultsType = data.resultsType,
+         this.resultsCount = data.resultsCount
+      }
+    });
+    modal.present();
+  }
 }
