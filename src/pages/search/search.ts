@@ -58,19 +58,19 @@ export class SearchPage {
     {name: 'Car', keyword: 'car+dealer'},
   ];
 
-  contentToShow = [];
+  // contentToShow = [];
   resultsCount = 1;
   resultsType = 'storeType';
   currentPosition = {lat: 0, lng: 0};
   isLocationEnabled = false; //To change
   addlistModal;
   deletelistModal;
-  searchInput;
+  // searchInput;
   lists: { name: string, products: any[] }[] = [];
   selectedList: string = 'Default'; //only for displaying, it may be deleted later
   activeProducts = [];
   inactiveProducts = [];
-  currentPrice = 0;
+  currentCost = 0;
 
   constructor(public navController: NavController,
               private geolocation: Geolocation,
@@ -89,12 +89,12 @@ export class SearchPage {
   ngOnInit(): void {
     this.addlistModal = document.getElementById('addlistModal');
     this.deletelistModal = document.getElementById('deletelistModal');
-    this.searchInput = document.getElementById('searchInput');
-    this.searchInput.addEventListener('keyup', e => this.keyUpHandler(e));
+    // this.searchInput = document.getElementById('searchInput');
+    // this.searchInput.addEventListener('keyup', e => this.keyUpHandler(e));
     document.addEventListener('click', event => {
       if (event.target == this.addlistModal) this.addlistModal.style.display = "none";
       if (event.target == this.deletelistModal) this.deletelistModal.style.display = "none";
-      this.toggleSuggestions(true)
+      // this.toggleSuggestions(true)
     });
     this.getPosition();
     //this.diagnostic.isLocationEnabled().then(() => this.getPosition())
@@ -108,33 +108,33 @@ export class SearchPage {
     });
   }
 
-  keyUpHandler(event) {
-    if (event.keyCode === 13) {
-      let isFound = false;
-      for (let x of this.content) {
-        if (x.name.search(new RegExp(event.target.value, 'i')) !== -1) {
-          this.chooseElement(x);
-          isFound = true;
-          break;
-        }
-      }
-      if (!isFound)
-        this.chooseElement({
-          name: event.target.value,
-          keyword: event.target.value
-        });
-
-      this.searchInput.value = '';
-      this.toggleSuggestions();
-    } else
-      this.showSuggestions();
-  }
+  // keyUpHandler(event) {
+  //   if (event.keyCode === 13) {
+  //     let isFound = false;
+  //     for (let x of this.content) {
+  //       if (x.name.search(new RegExp(event.target.value, 'i')) !== -1) {
+  //         this.chooseElement(x);
+  //         isFound = true;
+  //         break;
+  //       }
+  //     }
+  //     if (!isFound)
+  //       this.chooseElement({
+  //         name: event.target.value,
+  //         keyword: event.target.value
+  //       });
+  //
+  //     this.searchInput.value = '';
+  //     this.toggleSuggestions();
+  //   } else
+  //     this.showSuggestions();
+  // }
 
   chooseElement(element) {
     if (this.activeProducts.indexOf(element) > -1 || this.inactiveProducts.indexOf(element) > -1)
       return;
     this.lists.find(el => el.name === this.selectedList).products.push(element);
-    this.searchInput.value = '';
+    // this.searchInput.value = '';
   }
 
   removeChosenElement(element) {
@@ -186,33 +186,46 @@ export class SearchPage {
         }
       }
     }
-    this.calcCurrentPrice();
+    this.calcCurrentCost();
   }
 
-  calcCurrentPrice(){
+  calcCurrentCost(){
     if(this.activeProducts.length === 0)
-      return this.currentPrice = 0;
+      return this.currentCost = 0;
     if(this.activeProducts.length === 1)
-      return this.activeProducts[0].price ? this.currentPrice = this.activeProducts[0].price : this.currentPrice = 0;
+      return this.activeProducts[0].price ? this.currentCost = this.activeProducts[0].price : this.currentCost = 0;
 
-    this.currentPrice = this.activeProducts.reduce((a, b) => {
+    this.currentCost = this.activeProducts.reduce((a, b) => {
       if(!b.price) b.price = 0;
       return a + Number(b.price);
     }, 0);
   }
 
-  showProductDetailsModal(el, note, price) {
+  showProductDetailsModal(name, note, price, keyword, mode) {
     let modal = this.modalCtrl.create(ProductDetailsPage, {
-      name: el.name,
+      name: name ? name : '',
       note: note ? note : '',
-      price: price ? price : ''
+      price: price ? price : '',
+      keyword: keyword ? keyword : '',
+      mode: mode
     });
     modal.onDidDismiss(data => {
-      if (data) {
+      if (data && data.mode === 'edit') {
         let product = this.activeProducts.find(el => el.name === data.name);
+        product.name = data.name;
         product.note = data.note;
         product.price = data.price;
-        this.calcCurrentPrice();
+        product.keyword = data.keyword;
+        this.calcCurrentCost();
+      }
+      if (data && data.mode === 'add') {
+        this.lists.find(el => el.name === this.selectedList).products.push({
+          name: data.name,
+          note: data.note,
+          price: data.price,
+          keyword: data.keyword
+        });
+        this.calcCurrentCost();
       }
     });
     modal.present();
@@ -248,18 +261,18 @@ export class SearchPage {
     this.deletelistModal.style.display = "none";
   }
 
-  showSuggestions() {
-    this.toggleSuggestions();
-    this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
-  }
-
-  toggleSuggestions(turnOff = false) {
-    let suggestions = document.getElementById('suggestions');
-    if (this.searchInput.value === '' || turnOff === true)
-      suggestions.style.display = 'none';
-    else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
-      suggestions.style.display = 'block'
-  }
+  // showSuggestions() {
+  //   this.toggleSuggestions();
+  //   this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
+  // }
+  //
+  // toggleSuggestions(turnOff = false) {
+  //   let suggestions = document.getElementById('suggestions');
+  //   if (this.searchInput.value === '' || turnOff === true)
+  //     suggestions.style.display = 'none';
+  //   else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
+  //     suggestions.style.display = 'block'
+  // }
 
 
   @HostListener('window:beforeunload', ['$event'])

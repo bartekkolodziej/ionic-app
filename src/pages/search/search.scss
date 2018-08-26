@@ -61,24 +61,6 @@ page-search {
     transform: rotate(45deg);
   }
 
-  .sl-input {
-    color:white;
-    width: 85%;
-    padding: 8px;
-    background-color: #4b4b7e;
-    border: 1px solid #4b4b7e;
-    border-radius: 4px;
-    display:flex;
-  }
-
-  .header input {
-    color:white;
-    width: 90%;
-    border:none;
-    background-color: #4b4b7e;
-  }
-
-
   .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
@@ -101,27 +83,6 @@ page-search {
     border-radius: 5px;
   }
 
-  .search-icon{
-    width: 10%;
-  }
-
-  .cog {
-    color: white;
-    text-align: center;
-    width: 15%;
-    padding: 8px;
-  }
-
-  .header {
-    padding: 8px;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    background-color: #292961;
-    display:flex;
-    z-index:5;
-  }
-
   .footer {
     border-top: 1px solid #adadad;
     padding: 1px;
@@ -130,39 +91,15 @@ page-search {
     width: 100%;
   }
 
+
   .main {
     padding-top: 64px;
     overflow: auto;
     height: 100%;
   }
 
-  #suggestions {
-    position: fixed;
-    width: 100%;
-    display: none;
-    margin-top: 54px;
-    z-index: 5 !important;
-    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.2);
-    background-color: white;
-  }
-
-  .suggestion-item {
-    display: block;
-    padding: 16px;
-    border-bottom: 1px solid #dfdfdf
-  }
-
   .product-list ion-item:last-of-type {
     margin-bottom: 128px;
-  }
-
-  .delete-button {
-    float: right;
-    height: 40px;
-    background-color: #e2413e;
-    color: white;
-    border-radius: 0 4px 4px 0;
-    width: 15%;
   }
 
   .buttons{
@@ -174,48 +111,10 @@ page-search {
   .cost{
     position: fixed;
     bottom: 128px;
-
   }
 
   .buttons ion-col{
     text-align:center
-  }
-
-  .search-button {
-    background-color: #488aff;
-    padding: 12px 20px;
-    color: white;
-    border-radius: 4px
-  }
-
-  .addlist-button {
-    background-color: #28a745;
-    padding: 12px 20px;
-    color: white;
-    border-radius: 4px
-  }
-
-  .deletelist-button {
-    background-color: #e2413e;
-    padding: 12px 20px;
-    color: white;
-    border-radius: 4px
-  }
-
-  .confirm-button {
-    background-color: #e2413e;
-    padding: 16px 24px;
-    color: white;
-    border-radius: 4px;
-    margin: 16px;
-  }
-
-  .add-button {
-    background-color: #28a745;
-    padding: 16px 24px;
-    color: white;
-    border-radius: 4px;
-    margin: 16px;
   }
 
   .product-label {

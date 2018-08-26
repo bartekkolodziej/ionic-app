@@ -1,23 +1,48 @@
-<div class="header">
-  <div class="sl-input">
-    <div class="search-icon">
-      <ion-icon name="search"></ion-icon>
-    </div>
-    <input id="searchInput" placeholder="What are you searching for?">
-  </div>
+<!--<div class="header">-->
+  <!--&lt;!&ndash;<div class="sl-input">&ndash;&gt;-->
+  <!--&lt;!&ndash;<div class="search-icon">&ndash;&gt;-->
+  <!--&lt;!&ndash;<ion-icon name="search"></ion-icon>&ndash;&gt;-->
+  <!--&lt;!&ndash;</div>&ndash;&gt;-->
+  <!--&lt;!&ndash;<input id="searchInput" placeholder="Add product">&ndash;&gt;-->
+  <!--&lt;!&ndash;</div>&ndash;&gt;-->
 
+  <!--<div class="title">-->
+    <!--Shopping List-->
+  <!--</div>-->
 
-  <div class="cog" (click)="showSettingsModal()">
-    <ion-icon name="settings"></ion-icon>
-  </div>
-</div>
+  <!--<div class="header-icons">-->
+    <!--<div class="cog" (click)="showSettingsModal()">-->
+      <!--<ion-icon name="settings"></ion-icon>-->
+    <!--</div>-->
+  <!--</div>-->
 
-<div id="suggestions">
-  <div class="suggestion-item"
-       *ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">
-    {{x.name}}
-  </div>
-</div>
+<!--</div>-->
+
+<ion-header>
+  <ion-toolbar color="other">
+    <ion-buttons start>
+      <button ion-button icon-only (click)="showSettingsModal()">
+        <ion-icon name="settings"></ion-icon>
+      </button>
+    </ion-buttons>
+
+    <ion-title>Shopping list</ion-title>
+
+    <ion-buttons end style="margin-left:16px">
+      <button ion-button icon-only (click)="showProductDetailsModal(null, null, null, null, 'add')">
+        <ion-icon name="add"></ion-icon>
+      </button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<!--<div id="suggestions">-->
+  <!--<div class="suggestion-item"-->
+       <!--*ngFor="let x of contentToShow | slice:0:10" (click)="chooseElement(x)">-->
+    <!--{{x.name}}-->
+  <!--</div>-->
+<!--</div>-->
 
 <div class="main">
 
@@ -34,7 +59,7 @@
       <h2>{{y.name}}</h2>
       <p *ngIf="y.note">{{y.note}}</p>
       <p item-end *ngIf="y.price" style="margin-right:32px">Price: <span>{{y.price}}</span></p>
-      <button ion-button clear item-end (click)="showProductDetailsModal(y, y.note, y.price)">Edit</button>
+      <button ion-button clear item-end (click)="showProductDetailsModal(y.name, y.note, y.price, y.keyword, 'edit')">Edit</button>
     </ion-item>
 
     <ion-item *ngIf="activeProducts.length !== 0">
@@ -44,7 +69,7 @@
             Cost
           </ion-col>
           <ion-col style="text-align:right">
-            {{currentPrice}}
+            {{currentCost}}
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -58,15 +83,15 @@
         </label>
       </div>
 
-        <h2>
-          <del>{{x.name}}</del>
-        </h2>
-        <p *ngIf="x.note">
-          <del>{{x.note}}</del>
-        </p>
-        <p item-end *ngIf="x.price" style="margin-right:32px">
-          <del>Price: <span>{{x.price}}</span></del>
-        </p>
+      <h2>
+        <del>{{x.name}}</del>
+      </h2>
+      <p *ngIf="x.note">
+        <del>{{x.note}}</del>
+      </p>
+      <p item-end *ngIf="x.price" style="margin-right:32px">
+        <del>Price: <span>{{x.price}}</span></del>
+      </p>
     </ion-item>
 
   </ion-list>
@@ -78,12 +103,14 @@
           <button ion-button color="secondary" small (click)="showAddlistModal()">Add list</button>
         </ion-col>
         <ion-col>
-          <button ion-button color="danger" small (click)="showDeletelistModal()" *ngIf="selectedList !== 'Default'">Delete
+          <button ion-button color="danger" small (click)="showDeletelistModal()" *ngIf="selectedList !== 'Default'">
+            Delete
             list
           </button>
         </ion-col>
         <ion-col>
-          <button *ngIf="isLocationEnabled" ion-button color="primary" small (click)="searchForPlaces()">Show map</button>
+          <button *ngIf="isLocationEnabled" ion-button color="primary" small (click)="searchForPlaces()">Show map
+          </button>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -104,9 +131,9 @@
 <div class="modal" id="addlistModal">
   <div class="modal-content">
     <ion-list>
-    <ion-item>
-      <ion-input type="text" value="" placeholder="Name" #list></ion-input>
-    </ion-item>
+      <ion-item>
+        <ion-input type="text" value="" placeholder="Name" #list></ion-input>
+      </ion-item>
       <ion-item>
         <button ion-button color="secondary" (click)="addNewList(list.value)">Add</button>
         <button ion-button clear (click)="closeAddlistModal()">Cancel</button>

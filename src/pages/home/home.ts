@@ -38,7 +38,7 @@ export class HomePage implements OnInit {
     this.initMap();
     this.getMarkers();
     this.searchForPlaces(this.navParams.get('resultsCount'));
-   // this.allPlacesNearby();
+    // this.allPlacesNearby();
   }
 
   initMap() {
@@ -48,7 +48,7 @@ export class HomePage implements OnInit {
     });
 
     google.maps.event.addListener(this.map, 'click', () => {
-      for(let x of this.infoWindows)
+      for (let x of this.infoWindows)
         x.close();
     });
 
@@ -81,12 +81,12 @@ export class HomePage implements OnInit {
     for (let x of this.chosenElements) {
       if (x[this.resultsType]) {
         this.searchByType(resultsCount, x)
-      }else
+      } else
         this.searchByText(resultsCount, x);
     }
   }
 
-  searchByType(resultsCount: number, el){
+  searchByType(resultsCount: number, el) {
     this.placesService.nearbySearch({
       location: this.currentPosition,
       rankBy: google.maps.places.RankBy.DISTANCE,
@@ -94,20 +94,19 @@ export class HomePage implements OnInit {
     }, res => {
       let tmp = res.slice(0, resultsCount);
       this.updatePlaces(tmp, el);
-      if(resultsCount - tmp.length !== 0)
+      if (resultsCount - tmp.length !== 0)
         this.searchByText(resultsCount - tmp.length, el)
       else
         this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1) //this statement indicates that searching for product is completed
     });
   }
 
-  searchByText(resultsCount: number,el){
+  searchByText(resultsCount: number, el) {
     this.placesService.nearbySearch({
       location: this.currentPosition,
       rankBy: google.maps.places.RankBy.DISTANCE,
-      keyword: el.keyword
+      keyword: el.keyword !== '' ? el.keyword : el.name
     }, res => {
-      console.log(res)
       let tmp = res.slice(0, resultsCount);
       this.updatePlaces(tmp, el);
       this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1) //this statement indicates that searching for product is completed
@@ -115,7 +114,11 @@ export class HomePage implements OnInit {
   }
 
   allPlacesNearby() {
-    this.placesService.nearbySearch({location: {lat:50.063699, lng:19.932971}, radius: 50}, res => console.log(res))
+    this.placesService.nearbySearch({
+      location: {lat: 40.690744, lng: -73.940032},
+      radius: 200,
+      keyword: 'grocery'
+    }, res => console.log(res))
   }
 
   updatePlaces(slicedResponse, chosenEl) {
