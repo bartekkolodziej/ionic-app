@@ -16,11 +16,9 @@ import {IonicPage, NavController, NavParams, ViewController} from 'ionic-angular
 export class SettingsPage {
 
   resultsCount: number;
-  resultsType: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController) {
     this.resultsCount = this.navParams.get('resultsCount');
-    this.resultsType = this.navParams.get('resultsType');
   }
 
 
@@ -30,7 +28,6 @@ export class SettingsPage {
   save(){
     this.viewCtrl.dismiss({
       resultsCount: this.resultsCount,
-      resultsType: this.resultsType
     });
   }
 

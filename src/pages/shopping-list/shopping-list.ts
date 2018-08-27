@@ -17,7 +17,6 @@ export class ShoppingListPage {
 
   // contentToShow = [];
   resultsCount = 1;
-  resultsType = 'storeType';
   currentPosition = {lat: 0, lng: 0};
   isLocationEnabled = false; //To change
   addlistModal;
@@ -106,7 +105,6 @@ export class ShoppingListPage {
       chosenElements: this.lists.find(el => el.name === this.selectedList).activeProducts,
       resultsCount: this.resultsCount,
       currentPosition: this.currentPosition,
-      resultsType: this.resultsType
     });
   }
 
@@ -202,13 +200,10 @@ export class ShoppingListPage {
   showSettingsModal() {
     let modal = this.modalCtrl.create(SettingsPage, {
       resultsCount: this.resultsCount,
-      resultsType: this.resultsType
     });
     modal.onDidDismiss(data => {
-      if (data) {
-        this.resultsType = data.resultsType,
+      if (data)
           this.resultsCount = data.resultsCount
-      }
     });
     modal.present();
   }

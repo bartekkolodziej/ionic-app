@@ -42,15 +42,6 @@
         </ion-select>
       </ion-item>
     </ion-list>
-    <ion-list>
-      <ion-item>
-        <ion-label>Results type</ion-label>
-        <ion-select #t [(ngModel)]="resultsType">
-          <ion-option value="storeType" [selected]="true">Store</ion-option>
-          <ion-option value="poiType">Point of interest</ion-option>
-        </ion-select>
-      </ion-item>
-    </ion-list>
 
     <ion-item>
       <button ion-button clear color="primary" item-end (click)="cancel()">Cancel</button>

@@ -62,6 +62,7 @@ export class MapPage implements OnInit {
     //set custom pos marker and open its info window
     this.currentPositionMarker = new google.maps.Marker({position: this.currentPosition, map: this.map});
     let infoWindow = new google.maps.InfoWindow({content: 'Here you are'});
+    this.infoWindows.push(infoWindow);
     this.currentPositionMarker.addListener('click', () => infoWindow.open(this.map, this.currentPositionMarker));
     infoWindow.open(this.map, this.currentPositionMarker);
     this.currentPositionMarker.setMap(this.map);
@@ -171,7 +172,11 @@ export class MapPage implements OnInit {
         content: content
       });
       this.infoWindows.push(infoWindow);
-      marker.addListener('click', () => infoWindow.open(this.map, marker));
+      marker.addListener('click', () => {
+        for(let x of this.infoWindows)
+          x.close();
+        infoWindow.open(this.map, marker)
+      });
       this.markers.push(marker)
     }
     this.setMarkers(this.map)
