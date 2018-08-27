@@ -6,10 +6,10 @@ import {Geolocation} from '@ionic-native/geolocation';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 @Component({
-  selector: 'page-home',
-  templateUrl: 'home.html'
+  selector: 'page-map',
+  templateUrl: 'map.html'
 })
-export class HomePage implements OnInit {
+export class MapPage implements OnInit {
 
   @ViewChild('map') mapElement: any;
 

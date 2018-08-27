@@ -1,6 +1,6 @@
 import {Component, HostListener} from '@angular/core';
 import {IonicPage, ModalController, NavController, NavParams, PopoverController} from 'ionic-angular';
-import {HomePage} from "../home/home";
+import {MapPage} from "../map/map";
 import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from '@ionic-native/diagnostic';
 import {Storage} from '@ionic/storage';
@@ -16,10 +16,10 @@ import {SettingsPage} from "../settings/settings";
 
 @IonicPage()
 @Component({
-  selector: 'page-search',
-  templateUrl: 'search.html',
+  selector: 'page-shopping-list',
+  templateUrl: 'shopping-list.html',
 })
-export class SearchPage {
+export class ShoppingListPage {
 
   content = [
     {name: 'Cheese', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
@@ -142,7 +142,7 @@ export class SearchPage {
   }
 
   searchForPlaces() {
-    this.navController.push(HomePage, {
+    this.navController.push(MapPage, {
       chosenElements: this.lists.find(el => el.name === this.selectedList).products,
       resultsCount: this.resultsCount,
       currentPosition: this.currentPosition,

@@ -5,8 +5,8 @@ import {SplashScreen} from '@ionic-native/splash-screen';
 import {StatusBar} from '@ionic-native/status-bar';
 
 import {MyApp} from './app.component';
-import {HomePage} from '../pages/home/home';
-import {SearchPage} from "../pages/search/search";
+import { MapPage} from '../pages/map/map';
+import {ShoppingListPage} from "../pages/shopping-list/shopping-list";
 import {HttpClientModule} from "@angular/common/http";
 import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from "@ionic-native/diagnostic";
@@ -18,8 +18,8 @@ import {SettingsPage} from "../pages/settings/settings";
 @NgModule({
   declarations: [
     MyApp,
-    HomePage,
-    SearchPage,
+    MapPage,
+    ShoppingListPage,
     ProductDetailsPage,
     SettingsPage
   ],
@@ -32,8 +32,8 @@ import {SettingsPage} from "../pages/settings/settings";
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage,
-    SearchPage,
+    MapPage,
+    ShoppingListPage,
     ProductDetailsPage,
     SettingsPage
   ],
