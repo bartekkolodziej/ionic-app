@@ -1,5 +1,5 @@
 import {Component, HostListener} from '@angular/core';
-import {IonicPage, ModalController, NavController, NavParams, PopoverController} from 'ionic-angular';
+import {IonicPage, ModalController, NavController} from 'ionic-angular';
 import {MapPage} from "../map/map";
 import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from '@ionic-native/diagnostic';
@@ -7,12 +7,6 @@ import {Storage} from '@ionic/storage';
 import {ProductDetailsPage} from "../product-details/product-details";
 import {SettingsPage} from "../settings/settings";
 
-/**
- * Generated class for the SearchPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
@@ -21,52 +15,15 @@ import {SettingsPage} from "../settings/settings";
 })
 export class ShoppingListPage {
 
-  content = [
-    {name: 'Cheese', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Meat', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Sweets', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Mouthwash', keyword: 'pharmacy drug+store'},
-    {name: 'Restaurant', keyword: 'restaurant', storeType: 'restaurant'},
-    {name: 'Pancakes', keyword: 'pancakes'},
-    {name: 'Waffles', keyword: 'waffles'},
-    {name: 'Eggs', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Ice Creams', keyword: 'ice+cream'},
-    {name: 'Flowers', keyword: 'Florist'},
-    {name: 'Cigarettes', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Gas Oil', keyword: 'petrol+station'},
-    {name: 'Petrol', keyword: 'petrol+station'},
-    {name: 'Fuel', keyword: 'petrol+station'},
-    {name: 'Bread', keyword: 'convenience+store grocery bakery', storeType: 'grocery_or_supermarket'},
-    {name: 'Milk', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Electrics', keyword: 'electronics'},
-    {name: 'Bulb', keyword: 'electronics', poiType: 'electrician'},
-    {name: 'Museum', keyword: 'museum'},
-    {name: 'PS4', keyword: 'ps4'},
-    {name: 'Xbox', keyword: 'xbox'},
-    {name: 'Medicines', keyword: 'pharmacy'},
-    {name: 'Housewares', keyword: 'housewares white+goods'},
-    {name: 'Pet store', keyword: 'pet+store'},
-    {name: 'Coca-cola', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Beer', keyword: 'convenience+store grocery liquor+store'},
-    {name: 'Toothbrush', keyword: 'drug+store pharmacy'},
-    {name: 'Pizza', keyword: 'pizza'},
-    {name: 'Tea', keyword: 'tea'},
-    {name: 'Coffee', keyword: 'coffee', storeType: 'grocery_or_supermarket', poiType: 'cafe'},
-    {name: 'Cosmetics', keyword: 'drug+store'},
-    {name: 'Electrics', keyword: 'electrics'},
-    {name: 'Chips', keyword: 'convenience+store grocery', storeType: 'grocery_or_supermarket'},
-    {name: 'Car', keyword: 'car+dealer'},
-  ];
-
   // contentToShow = [];
   resultsCount = 1;
   resultsType = 'storeType';
   currentPosition = {lat: 0, lng: 0};
   isLocationEnabled = false; //To change
   addlistModal;
-  deletelistModal;
+  clearListModal;
   // searchInput;
-  lists: { name: string, products: any[] }[] = [];
+  lists: { name: string, activeProducts: any[], inactiveProducts: any[] }[] = [];
   selectedList: string = 'Default'; //only for displaying, it may be deleted later
   activeProducts = [];
   inactiveProducts = [];
@@ -81,19 +38,20 @@ export class ShoppingListPage {
     this.storage.get('lists').then(val => {
       if (val !== null)
         this.lists = val;
-      this.lists.push({name: 'Default', products: []});
-      this.activeProducts = this.lists.find(el => el.name === 'Default').products
+      this.lists.push({name: 'Default', activeProducts: [], inactiveProducts: []});
+      this.activeProducts = this.lists.find(el => el.name === 'Default').activeProducts
+      this.inactiveProducts = this.lists.find(el => el.name === 'Default').inactiveProducts
     });
   }
 
   ngOnInit(): void {
     this.addlistModal = document.getElementById('addlistModal');
-    this.deletelistModal = document.getElementById('deletelistModal');
+    this.clearListModal = document.getElementById('clearListModal');
     // this.searchInput = document.getElementById('searchInput');
     // this.searchInput.addEventListener('keyup', e => this.keyUpHandler(e));
     document.addEventListener('click', event => {
       if (event.target == this.addlistModal) this.addlistModal.style.display = "none";
-      if (event.target == this.deletelistModal) this.deletelistModal.style.display = "none";
+      if (event.target == this.clearListModal) this.clearListModal.style.display = "none";
       // this.toggleSuggestions(true)
     });
     this.getPosition();
@@ -130,20 +88,22 @@ export class ShoppingListPage {
   //     this.showSuggestions();
   // }
 
-  chooseElement(element) {
-    if (this.activeProducts.indexOf(element) > -1 || this.inactiveProducts.indexOf(element) > -1)
-      return;
-    this.lists.find(el => el.name === this.selectedList).products.push(element);
+  addElement(element) {
+    this.lists.find(el => el.name === this.selectedList).activeProducts.push(element);
+    this.calcCurrentCost();
     // this.searchInput.value = '';
   }
 
   removeChosenElement(element) {
-    this.lists.find(el => el.name === this.selectedList).products = this.lists.find(el => el.name === this.selectedList).products.filter(el => el !== element)
+    this.lists
+      .find(el => el.name === this.selectedList).activeProducts = this.lists
+      .find(el => el.name === this.selectedList).activeProducts
+      .filter(el => el !== element)
   }
 
   searchForPlaces() {
     this.navController.push(MapPage, {
-      chosenElements: this.lists.find(el => el.name === this.selectedList).products,
+      chosenElements: this.lists.find(el => el.name === this.selectedList).activeProducts,
       resultsCount: this.resultsCount,
       currentPosition: this.currentPosition,
       resultsType: this.resultsType
@@ -151,21 +111,30 @@ export class ShoppingListPage {
   }
 
   addNewList(val) {
-    this.lists.push({name: val, products: []});
+    this.lists.push({name: val, activeProducts: [], inactiveProducts: []});
     this.selectedList = val;
     this.closeAddlistModal();
-    this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).activeProducts;
+    this.inactiveProducts = this.lists.find(el => el.name === this.selectedList).inactiveProducts;
   }
 
   deleteList() {
     this.lists = this.lists.filter(el => el.name !== this.selectedList);
     this.selectedList = 'Default';
-    this.closeDeletelistModal();
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).activeProducts;
+    this.inactiveProducts = this.lists.find(el => el.name === this.selectedList).inactiveProducts;
+  }
+
+  clearList(){
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).activeProducts = [];
+    this.inactiveProducts = this.lists.find(el => el.name === this.selectedList).inactiveProducts = [];
+    this.closeClearListModal();
   }
 
   selectList(val) {
     this.selectedList = val;
-    this.activeProducts = this.lists.find(el => el.name === this.selectedList).products;
+    this.activeProducts = this.lists.find(el => el.name === this.selectedList).activeProducts;
+    this.inactiveProducts = this.lists.find(el => el.name === this.selectedList).inactiveProducts;
   }
 
   setProductState(event, name) {
@@ -219,13 +188,12 @@ export class ShoppingListPage {
         this.calcCurrentCost();
       }
       if (data && data.mode === 'add') {
-        this.lists.find(el => el.name === this.selectedList).products.push({
+        this.addElement({
           name: data.name,
           note: data.note,
           price: data.price,
           keyword: data.keyword
         });
-        this.calcCurrentCost();
       }
     });
     modal.present();
@@ -253,12 +221,12 @@ export class ShoppingListPage {
     this.addlistModal.style.display = "none";
   }
 
-  showDeletelistModal() {
-    this.deletelistModal.style.display = 'block'
+  showClearListModal() {
+    this.clearListModal.style.display = 'block'
   }
 
-  closeDeletelistModal() {
-    this.deletelistModal.style.display = "none";
+  closeClearListModal() {
+    this.clearListModal.style.display = "none";
   }
 
   // showSuggestions() {

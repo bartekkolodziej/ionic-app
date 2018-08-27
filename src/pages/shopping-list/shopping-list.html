@@ -103,9 +103,11 @@
           <button ion-button color="secondary" small (click)="showAddlistModal()">Add list</button>
         </ion-col>
         <ion-col>
-          <button ion-button color="danger" small (click)="showDeletelistModal()" *ngIf="selectedList !== 'Default'">
-            Delete
-            list
+          <button ion-button color="danger" small (click)="deleteList()" *ngIf="activeProducts.length === 0 && inactiveProducts.length === 0 && selectedList !== 'Default'">
+            Delete list
+          </button>
+          <button ion-button color="danger" small (click)="showClearListModal()" *ngIf="activeProducts.length > 0 || inactiveProducts.length > 0">
+            Clear list
           </button>
         </ion-col>
         <ion-col>
@@ -142,15 +144,15 @@
   </div>
 </div>
 
-<div class="modal" id="deletelistModal">
+<div class="modal" id="clearListModal">
   <div class="modal-content">
     <ion-list>
       <ion-item>
-        <h3>Delete current list?</h3>
+        <h3>Are you sure?</h3>
       </ion-item>
       <ion-item>
-        <button ion-button color="danger" (click)="deleteList()">Delete</button>
-        <button ion-button clear (click)="closeDeletelistModal()">Cancel</button>
+        <button ion-button color="danger" (click)="clearList()">Clear</button>
+        <button ion-button clear (click)="closeClearListModal()">Cancel</button>
       </ion-item>
     </ion-list>
   </div>

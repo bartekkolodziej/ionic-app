@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{mode === 'edit' ? 'Edit' : 'Add'}} new prodcut</ion-title>
+    <ion-title>{{mode === 'edit' ? 'Edit' : 'Add new'}} prodcut</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -17,26 +17,23 @@
   <ion-list>
 
     <ion-item>
-      <ion-label>Name</ion-label>
+      <ion-label color="primary">Name:</ion-label>
       <ion-input [(ngModel)]="name"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label>Price</ion-label>
+      <ion-label color="primary">Price:</ion-label>
       <ion-input [(ngModel)]="price" type="number"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label>Note</ion-label>
+      <ion-label color="primary">Note:</ion-label>
       <ion-input [(ngModel)]="note"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label>Store type</ion-label>
-      <ion-select [(ngModel)]="keyword">
-        <ion-option value="grocery" [selected]="true">1</ion-option>
-        <ion-option value="supermarket">2</ion-option>
-      </ion-select>
+      <ion-label stacked color="primary">Store</ion-label>
+      <ion-input [(ngModel)]="keyword" placeholder="Grocery, Walmart etc."></ion-input>
     </ion-item>
 
     <ion-item>

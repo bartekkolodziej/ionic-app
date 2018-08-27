@@ -23,17 +23,16 @@ export class MapPage implements OnInit {
   markers: google.maps.Marker[] = [];
   numberOfCompletedRequests: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  chosenElements: { name: string, keyword: string, storeType: string, poiType: string }[] = [];
+  chosenElements: { name: string, keyword: string}[] = [];
   places: { place: any, products: string }[];
-  resultsType: string;
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private http: HttpClient, private geolocation: Geolocation) {
     this.places = [];
-    this.resultsType = navParams.get('resultsType');
   }
 
   ngOnInit(): void {
     this.chosenElements = this.navParams.get('chosenElements');
+    console.log(this.chosenElements)
     this.currentPosition = this.navParams.get('currentPosition');
     this.initMap();
     this.getMarkers();
@@ -79,33 +78,33 @@ export class MapPage implements OnInit {
 
     //search by type, if didnt found all places search by keyword
     for (let x of this.chosenElements) {
-      if (x[this.resultsType]) {
-        this.searchByType(resultsCount, x)
+      if (x.keyword) {
+        this.searchByKeyword(resultsCount, x)
       } else
-        this.searchByText(resultsCount, x);
+        this.searchByName(resultsCount, x);
     }
   }
 
-  searchByType(resultsCount: number, el) {
+  searchByKeyword(resultsCount: number, el) {
     this.placesService.nearbySearch({
       location: this.currentPosition,
       rankBy: google.maps.places.RankBy.DISTANCE,
-      type: el[this.resultsType]
+      keyword: el.keyword
     }, res => {
       let tmp = res.slice(0, resultsCount);
       this.updatePlaces(tmp, el);
       if (resultsCount - tmp.length !== 0)
-        this.searchByText(resultsCount - tmp.length, el)
+        this.searchByName(resultsCount - tmp.length, el)
       else
         this.numberOfCompletedRequests.next(this.numberOfCompletedRequests.getValue() + 1) //this statement indicates that searching for product is completed
     });
   }
 
-  searchByText(resultsCount: number, el) {
+  searchByName(resultsCount: number, el) {
     this.placesService.nearbySearch({
       location: this.currentPosition,
       rankBy: google.maps.places.RankBy.DISTANCE,
-      keyword: el.keyword !== '' ? el.keyword : el.name
+      keyword: el.name
     }, res => {
       let tmp = res.slice(0, resultsCount);
       this.updatePlaces(tmp, el);
@@ -115,9 +114,9 @@ export class MapPage implements OnInit {
 
   allPlacesNearby() {
     this.placesService.nearbySearch({
-      location: {lat: 40.690744, lng: -73.940032},
+      location: {lat: 50.074453, lng: 19.994433},
       radius: 200,
-      keyword: 'grocery'
+      type: 'grocery_or_supermarket'
     }, res => console.log(res))
   }
 
