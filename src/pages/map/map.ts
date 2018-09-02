@@ -5,58 +5,65 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {Geolocation} from '@ionic-native/geolocation';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
+declare var google: any;
+
+
 @Component({
   selector: 'page-map',
   templateUrl: 'map.html'
 })
-export class MapPage implements OnInit {
+export class MapPage implements OnInit{
 
   @ViewChild('map') mapElement: any;
 
-  map;
+
+  map: google.maps.Map;
   placesService: google.maps.places.PlacesService;
 
-  currentPosition;
+  currentPosition = {lat: 0, lng: 0};
   currentPositionMarker: google.maps.Marker;
 
   infoWindows: google.maps.InfoWindow[] = [];
   markers: google.maps.Marker[] = [];
   numberOfCompletedRequests: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  chosenElements: { name: string, keyword: string}[] = [];
+  chosenElements: { name: string, keyword: string }[] = [];
   places: { place: any, products: string }[];
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private http: HttpClient, private geolocation: Geolocation) {
     this.places = [];
+    console.log('map component')
   }
 
-  ngOnInit(): void {
+  ionViewDidLoad(): void {
     this.chosenElements = this.navParams.get('chosenElements');
-    console.log(this.chosenElements)
-    this.currentPosition = this.navParams.get('currentPosition');
     this.initMap();
-    this.getMarkers();
+
     this.searchForPlaces(this.navParams.get('resultsCount'));
-    // this.allPlacesNearby();
+    this.allPlacesNearby();
   }
 
   initMap() {
-    this.map = new google.maps.Map(this.mapElement.nativeElement, {
-      center: this.currentPosition,
-      zoom: 16
+    this.geolocation.getCurrentPosition().then(el => {
+      this.currentPosition.lat = el.coords.latitude;
+      this.currentPosition.lng = el.coords.longitude;
+      this.map = new google.maps.Map(this.mapElement.nativeElement, {
+        center: this.currentPosition,
+        zoom: 16
+      });
+      google.maps.event.addListener(this.map, 'click', () => {
+        for (let x of this.infoWindows)
+          x.close();
+      });
+      this.getMarkers();
     });
-
-    google.maps.event.addListener(this.map, 'click', () => {
-      for (let x of this.infoWindows)
-        x.close();
-    });
-
     this.geolocation.watchPosition().subscribe(data => {
       this.currentPosition.lat = data.coords.latitude;
       this.currentPosition.lng = data.coords.longitude;
       this.currentPositionMarker.setPosition(this.currentPosition);
     });
   }
+
 
   getMarkers() {
     //set custom pos marker and open its info window
@@ -167,13 +174,13 @@ export class MapPage implements OnInit {
       let content = `<span style="display:block; padding:2px"><b>${x.place.name}</b></span>
                     <span style="display: block; padding: 2px">${x.place.vicinity}</span>
                     <span style="display: block; padding: 2px">${open}</span>
-                    <span style="display:block; padding:2px">Here you can get: ${x.products}<span>`
+                    <span style="display:block; padding:2px">Here you can get: ${x.products}<span>`;
       let infoWindow = new google.maps.InfoWindow({
         content: content
       });
       this.infoWindows.push(infoWindow);
       marker.addListener('click', () => {
-        for(let x of this.infoWindows)
+        for (let x of this.infoWindows)
           x.close();
         infoWindow.open(this.map, marker)
       });
@@ -202,6 +209,9 @@ export class MapPage implements OnInit {
       x.setMap(null);
     this.markers = [];
     this.places = [];
+  }
+
+  ngOnInit(): void {
   }
 
 }
