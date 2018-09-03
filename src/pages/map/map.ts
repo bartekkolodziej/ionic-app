@@ -38,9 +38,6 @@ export class MapPage implements OnInit{
   ionViewDidLoad(): void {
     this.chosenElements = this.navParams.get('chosenElements');
     this.initMap();
-
-    this.searchForPlaces(this.navParams.get('resultsCount'));
-    this.allPlacesNearby();
   }
 
   initMap() {
@@ -56,11 +53,12 @@ export class MapPage implements OnInit{
           x.close();
       });
       this.getMarkers();
-    });
-    this.geolocation.watchPosition().subscribe(data => {
-      this.currentPosition.lat = data.coords.latitude;
-      this.currentPosition.lng = data.coords.longitude;
-      this.currentPositionMarker.setPosition(this.currentPosition);
+      this.geolocation.watchPosition().subscribe(data => {
+        this.currentPosition.lat = data.coords.latitude;
+        this.currentPosition.lng = data.coords.longitude;
+        this.currentPositionMarker.setPosition(this.currentPosition);
+      });
+      this.searchForPlaces(this.navParams.get('resultsCount'));
     });
   }
 

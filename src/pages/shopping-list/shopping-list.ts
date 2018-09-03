@@ -1,12 +1,13 @@
 import {Component, HostListener} from '@angular/core';
 import {IonicPage, ModalController, NavController} from 'ionic-angular';
 import {MapPage} from "../map/map";
-import {Geolocation} from '@ionic-native/geolocation';
 import {Diagnostic} from '@ionic-native/diagnostic';
 import {Storage} from '@ionic/storage';
 import {ProductDetailsPage} from "../product-details/product-details";
 import {SettingsPage} from "../settings/settings";
 import {Network} from "@ionic-native/network";
+
+declare var google;
 
 @IonicPage()
 @Component({
@@ -37,7 +38,7 @@ export class ShoppingListPage {
       if (val !== null)
         this.lists = val;
       this.lists.push({name: 'Default', activeProducts: [], inactiveProducts: []});
-      this.activeProducts = this.lists.find(el => el.name === 'Default').activeProducts
+      this.activeProducts = this.lists.find(el => el.name === 'Default').activeProducts;
       this.inactiveProducts = this.lists.find(el => el.name === 'Default').inactiveProducts
     });
   }
@@ -72,8 +73,7 @@ export class ShoppingListPage {
 
   searchForPlaces() {
     this.diagnostic.isLocationEnabled().then(res => {
-      console.log(res, this.internetConnection)
-      if (res === true && this.internetConnection === true) {
+      if (res === true && this.network.type !== 'none') {
         this.navController.push(MapPage, {
           chosenElements: this.lists.find(el => el.name === this.selectedList).activeProducts,
           resultsCount: this.resultsCount,
@@ -84,12 +84,13 @@ export class ShoppingListPage {
     });
   }
 
-  addNewList(val) {
-    this.lists.push({name: val, activeProducts: [], inactiveProducts: []});
-    this.selectedList = val;
+  addNewList(list) {
+    this.lists.push({name: list.value, activeProducts: [], inactiveProducts: []});
+    this.selectedList = list.value;
     this.closeAddlistModal();
     this.activeProducts = this.lists.find(el => el.name === this.selectedList).activeProducts;
     this.inactiveProducts = this.lists.find(el => el.name === this.selectedList).inactiveProducts;
+    list.value = '';
   }
 
   deleteList() {
