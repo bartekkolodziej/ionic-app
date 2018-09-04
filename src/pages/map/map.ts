@@ -32,7 +32,6 @@ export class MapPage implements OnInit{
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private http: HttpClient, private geolocation: Geolocation) {
     this.places = [];
-    console.log('map component')
   }
 
   ionViewDidLoad(): void {
