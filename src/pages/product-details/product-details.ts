@@ -20,9 +20,11 @@ export class ProductDetailsPage {
   note:string;
   keyword:string;
   mode: string;
+  previousName: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController) {
     this.name = this.navParams.get('name');
+    this.previousName = this.navParams.get('name');
     this.price = this.navParams.get('price');
     this.note = this.navParams.get('note');
     this.keyword = this.navParams.get('keyword');
@@ -36,7 +38,7 @@ export class ProductDetailsPage {
     this.navCtrl.pop({});
   }
   save(){
-    this.viewCtrl.dismiss({name:this.name, price: this.price, note: this.note, keyword: this.keyword, mode: this.mode});
+    this.viewCtrl.dismiss({previousName: this.previousName, name:this.name, price: this.price, note: this.note, keyword: this.keyword, mode: this.mode});
   }
 
 }

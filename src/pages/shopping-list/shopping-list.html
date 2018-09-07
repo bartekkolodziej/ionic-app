@@ -111,7 +111,7 @@
           </button>
         </ion-col>
         <ion-col>
-          <button *ngIf="isLocationEnabled" ion-button color="primary" small (click)="searchForPlaces()">Show map
+          <button ion-button color="primary" small (click)="searchForPlaces()">Show map
           </button>
         </ion-col>
       </ion-row>
@@ -158,3 +158,8 @@
   </div>
 </div>
 
+<div class="modal" id="locNetModal">
+  <div class="modal-content">
+   Enable location and internet connection
+  </div>
+</div>

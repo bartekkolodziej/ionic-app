@@ -13,6 +13,7 @@ import {Diagnostic} from "@ionic-native/diagnostic";
 import {IonicStorageModule} from '@ionic/storage';
 import {ProductDetailsPage} from "../pages/product-details/product-details";
 import {SettingsPage} from "../pages/settings/settings";
+import {Network} from "@ionic-native/network";
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import {SettingsPage} from "../pages/settings/settings";
     SplashScreen,
     Geolocation,
     Diagnostic,
+    Network,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

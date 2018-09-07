@@ -6,6 +6,7 @@ import {Diagnostic} from '@ionic-native/diagnostic';
 import {Storage} from '@ionic/storage';
 import {ProductDetailsPage} from "../product-details/product-details";
 import {SettingsPage} from "../settings/settings";
+import {Network} from "@ionic-native/network";
 
 
 @IonicPage()
@@ -15,13 +16,11 @@ import {SettingsPage} from "../settings/settings";
 })
 export class ShoppingListPage {
 
-  // contentToShow = [];
   resultsCount = 1;
   currentPosition = {lat: 0, lng: 0};
-  isLocationEnabled = false; //To change
   addlistModal;
   clearListModal;
-  // searchInput;
+  locNetModal;
   lists: { name: string, activeProducts: any[], inactiveProducts: any[] }[] = [];
   selectedList: string = 'Default'; //only for displaying, it may be deleted later
   activeProducts = [];
@@ -31,61 +30,40 @@ export class ShoppingListPage {
   constructor(public navController: NavController,
               private geolocation: Geolocation,
               private diagnostic: Diagnostic,
+              private network: Network,
               private storage: Storage,
               public modalCtrl: ModalController
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.storage.get('lists').then(val => {
       if (val !== null)
         this.lists = val;
       this.lists.push({name: 'Default', activeProducts: [], inactiveProducts: []});
-      this.activeProducts = this.lists.find(el => el.name === 'Default').activeProducts
+      this.activeProducts = this.lists.find(el => el.name === 'Default').activeProducts;
       this.inactiveProducts = this.lists.find(el => el.name === 'Default').inactiveProducts
     });
-  }
 
-  ngOnInit(): void {
     this.addlistModal = document.getElementById('addlistModal');
     this.clearListModal = document.getElementById('clearListModal');
-    // this.searchInput = document.getElementById('searchInput');
-    // this.searchInput.addEventListener('keyup', e => this.keyUpHandler(e));
+    this.locNetModal = document.getElementById('locNetModal');
     document.addEventListener('click', event => {
       if (event.target == this.addlistModal) this.addlistModal.style.display = "none";
       if (event.target == this.clearListModal) this.clearListModal.style.display = "none";
-      // this.toggleSuggestions(true)
+      if (event.target == this.locNetModal) this.locNetModal.style.display = "none";
     });
-    this.getPosition();
-    //this.diagnostic.isLocationEnabled().then(() => this.getPosition())
+
+    if(this.network.type !== 'none')
+      this.getPosition();
+    this.network.onConnect().subscribe(() => this.getPosition());
   }
 
   getPosition() {
-    this.isLocationEnabled = true;
-    this.geolocation.getCurrentPosition().then(el => {
+    this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then(el => {
       this.currentPosition.lat = el.coords.latitude;
       this.currentPosition.lng = el.coords.longitude;
     });
   }
-
-  // keyUpHandler(event) {
-  //   if (event.keyCode === 13) {
-  //     let isFound = false;
-  //     for (let x of this.content) {
-  //       if (x.name.search(new RegExp(event.target.value, 'i')) !== -1) {
-  //         this.chooseElement(x);
-  //         isFound = true;
-  //         break;
-  //       }
-  //     }
-  //     if (!isFound)
-  //       this.chooseElement({
-  //         name: event.target.value,
-  //         keyword: event.target.value
-  //       });
-  //
-  //     this.searchInput.value = '';
-  //     this.toggleSuggestions();
-  //   } else
-  //     this.showSuggestions();
-  // }
 
   addElement(element) {
     this.lists.find(el => el.name === this.selectedList).activeProducts.push(element);
@@ -98,14 +76,6 @@ export class ShoppingListPage {
       .find(el => el.name === this.selectedList).activeProducts = this.lists
       .find(el => el.name === this.selectedList).activeProducts
       .filter(el => el !== element)
-  }
-
-  searchForPlaces() {
-    this.navController.push(MapPage, {
-      chosenElements: this.lists.find(el => el.name === this.selectedList).activeProducts,
-      resultsCount: this.resultsCount,
-      currentPosition: this.currentPosition,
-    });
   }
 
   addNewList(val) {
@@ -178,7 +148,7 @@ export class ShoppingListPage {
     });
     modal.onDidDismiss(data => {
       if (data && data.mode === 'edit') {
-        let product = this.activeProducts.find(el => el.name === data.name);
+        let product = this.activeProducts.find(el => el.name === data.previousName);
         product.name = data.name;
         product.note = data.note;
         product.price = data.price;
@@ -216,6 +186,14 @@ export class ShoppingListPage {
     this.addlistModal.style.display = "none";
   }
 
+  showLocNetModal() {
+    this.locNetModal.style.display = 'block'
+  }
+
+  closeLocNetModal() {
+    this.locNetModal.style.display = "none";
+  }
+
   showClearListModal() {
     this.clearListModal.style.display = 'block'
   }
@@ -224,19 +202,19 @@ export class ShoppingListPage {
     this.clearListModal.style.display = "none";
   }
 
-  // showSuggestions() {
-  //   this.toggleSuggestions();
-  //   this.contentToShow = this.content.filter(el => el.name.search(new RegExp(this.searchInput.value, 'i')) !== -1);
-  // }
-  //
-  // toggleSuggestions(turnOff = false) {
-  //   let suggestions = document.getElementById('suggestions');
-  //   if (this.searchInput.value === '' || turnOff === true)
-  //     suggestions.style.display = 'none';
-  //   else if (suggestions.style.display === 'none' && this.searchInput.value !== '')
-  //     suggestions.style.display = 'block'
-  // }
-
+  searchForPlaces() {
+    this.diagnostic.isLocationEnabled().then(res => {
+      if(res === true && this.network.type !== 'none'){
+        this.navController.push(MapPage, {
+          chosenElements: this.lists.find(el => el.name === this.selectedList).activeProducts,
+          resultsCount: this.resultsCount,
+          currentPosition: this.currentPosition,
+        });
+      }else{
+        this.showLocNetModal();
+      }
+    });
+  }
 
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler() {

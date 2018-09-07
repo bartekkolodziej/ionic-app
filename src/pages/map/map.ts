@@ -23,7 +23,7 @@ export class MapPage implements OnInit {
   markers: google.maps.Marker[] = [];
   numberOfCompletedRequests: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  chosenElements: { name: string, keyword: string}[] = [];
+  chosenElements: { name: string, keyword: string }[] = [];
   places: { place: any, products: string }[];
 
   constructor(public navCtrl: NavController, private navParams: NavParams, private http: HttpClient, private geolocation: Geolocation) {
@@ -32,26 +32,40 @@ export class MapPage implements OnInit {
 
   ngOnInit(): void {
     this.chosenElements = this.navParams.get('chosenElements');
-    console.log(this.chosenElements)
     this.currentPosition = this.navParams.get('currentPosition');
     this.initMap();
-    this.getMarkers();
-    this.searchForPlaces(this.navParams.get('resultsCount'));
-    // this.allPlacesNearby();
   }
 
   initMap() {
-    this.map = new google.maps.Map(this.mapElement.nativeElement, {
-      center: this.currentPosition,
-      zoom: 16
-    });
+    if (this.currentPosition != {lat: 0, lng: 0}) {
+      this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then(el => {
+        this.currentPosition.lat = el.coords.latitude;
+        this.currentPosition.lng = el.coords.longitude;
+        this.map = new google.maps.Map(this.mapElement.nativeElement, {
+          center: this.currentPosition,
+          zoom: 16
+        });
+        google.maps.event.addListener(this.map, 'click', () => {
+          for (let x of this.infoWindows)
+            x.close();
+        });
+        this.getMarkers();
+        this.searchForPlaces(this.navParams.get('resultsCount'));
+      });
+    }else{
+      this.map = new google.maps.Map(this.mapElement.nativeElement, {
+        center: this.currentPosition,
+        zoom: 16
+      });
 
-    google.maps.event.addListener(this.map, 'click', () => {
-      for (let x of this.infoWindows)
-        x.close();
-    });
-
-    this.geolocation.watchPosition().subscribe(data => {
+      google.maps.event.addListener(this.map, 'click', () => {
+        for (let x of this.infoWindows)
+          x.close();
+      });
+      this.getMarkers();
+      this.searchForPlaces(this.navParams.get('resultsCount'));
+    }
+    this.geolocation.watchPosition({enableHighAccuracy: true}).subscribe(data => {
       this.currentPosition.lat = data.coords.latitude;
       this.currentPosition.lng = data.coords.longitude;
       this.currentPositionMarker.setPosition(this.currentPosition);
@@ -164,16 +178,16 @@ export class MapPage implements OnInit {
       if (x.place.opening_hours)
         x.place.opening_hours.open_now === true ? open = 'Open now' : open = 'Closed now';
 
-      let content = `<span style="display:block; padding:2px"><b>${x.place.name}</b></span>
+      let content = `<div style="max-width:160px"><span style="display:block; padding:2px"><b>${x.place.name}</b></span>
                     <span style="display: block; padding: 2px">${x.place.vicinity}</span>
                     <span style="display: block; padding: 2px">${open}</span>
-                    <span style="display:block; padding:2px">Here you can get: ${x.products}<span>`
+                    <span style="display:block; padding:2px">Here you can get: ${x.products}<span></div>`
       let infoWindow = new google.maps.InfoWindow({
         content: content
       });
       this.infoWindows.push(infoWindow);
       marker.addListener('click', () => {
-        for(let x of this.infoWindows)
+        for (let x of this.infoWindows)
           x.close();
         infoWindow.open(this.map, marker)
       });
