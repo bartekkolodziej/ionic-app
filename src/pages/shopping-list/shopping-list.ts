@@ -17,7 +17,7 @@ import {Network} from "@ionic-native/network";
 export class ShoppingListPage {
 
   resultsCount = 1;
-  currentPosition = {lat: 0, lng: 0};
+  currentPosition = null;
   addlistModal;
   clearListModal;
   locNetModal;
@@ -60,6 +60,7 @@ export class ShoppingListPage {
 
   getPosition() {
     this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then(el => {
+      this.currentPosition = {lat:0, lng:0};
       this.currentPosition.lat = el.coords.latitude;
       this.currentPosition.lng = el.coords.longitude;
     });

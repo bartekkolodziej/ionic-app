@@ -5,6 +5,8 @@ import {HttpClient, HttpClientModule} from "@angular/common/http";
 import {Geolocation} from '@ionic-native/geolocation';
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
+declare var google;
+
 @Component({
   selector: 'page-map',
   templateUrl: 'map.html'
@@ -37,7 +39,7 @@ export class MapPage implements OnInit {
   }
 
   initMap() {
-    if (this.currentPosition != {lat: 0, lng: 0}) {
+    if (this.currentPosition === null) {
       this.geolocation.getCurrentPosition({enableHighAccuracy: true}).then(el => {
         this.currentPosition.lat = el.coords.latitude;
         this.currentPosition.lng = el.coords.longitude;
@@ -45,10 +47,7 @@ export class MapPage implements OnInit {
           center: this.currentPosition,
           zoom: 16
         });
-        google.maps.event.addListener(this.map, 'click', () => {
-          for (let x of this.infoWindows)
-            x.close();
-        });
+
         this.getMarkers();
         this.searchForPlaces(this.navParams.get('resultsCount'));
       });
@@ -58,10 +57,6 @@ export class MapPage implements OnInit {
         zoom: 16
       });
 
-      google.maps.event.addListener(this.map, 'click', () => {
-        for (let x of this.infoWindows)
-          x.close();
-      });
       this.getMarkers();
       this.searchForPlaces(this.navParams.get('resultsCount'));
     }
@@ -193,6 +188,10 @@ export class MapPage implements OnInit {
       });
       this.markers.push(marker)
     }
+    google.maps.event.addListener(this.map, 'click', () => {
+      for (let x of this.infoWindows)
+        x.close();
+    });
     this.setMarkers(this.map)
     this.scaleMap();
   }
