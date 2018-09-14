@@ -1,0 +1,45 @@
+<!--
+  Generated template for the ProductDetailsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>{{mode === 'edit' ? 'Edit' : 'Add new'}} prodcut</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+
+    <ion-item>
+      <ion-label color="primary">Name:</ion-label>
+      <ion-input [(ngModel)]="name"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary">Price:</ion-label>
+      <ion-input [(ngModel)]="price" type="number"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label color="primary">Note:</ion-label>
+      <ion-input [(ngModel)]="note"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked color="primary">Store (fill for better navigation results)</ion-label>
+      <ion-input [(ngModel)]="keyword" placeholder="Grocery, Walmart etc."></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <button ion-button clear color="primary" item-end (click)="cancel()">Cancel</button>
+      <button ion-button color="primary" item-end (click)="save()">Save</button>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

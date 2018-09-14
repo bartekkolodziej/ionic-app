@@ -1,0 +1,139 @@
+
+<ion-header>
+  <ion-toolbar color="other">
+    <ion-buttons start>
+      <button ion-button icon-only (click)="showSettingsModal()">
+        <ion-icon name="settings"></ion-icon>
+      </button>
+    </ion-buttons>
+
+    <ion-title>Shopping list</ion-title>
+
+    <ion-buttons end style="margin-left:16px">
+      <button ion-button icon-only (click)="showProductDetailsModal(null, null, null, null, 'add')">
+        <ion-icon name="add"></ion-icon>
+      </button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<div class="main">
+
+  <ion-list style="z-index:1 !important;" class="product-list">
+
+    <ion-item *ngFor="let y of activeProducts">
+      <div style="margin-right: 24px;" item-start>
+        <label class="cb-container">
+          <input type="checkbox" (change)="setProductState($event, y.name)">
+          <span class="checkmark"></span>
+        </label>
+      </div>
+
+      <h2>{{y.name}}</h2>
+      <p *ngIf="y.note">{{y.note}}</p>
+      <p item-end *ngIf="y.price" style="margin-right:32px">Price: <span>{{y.price}}</span></p>
+      <button ion-button clear item-end (click)="showProductDetailsModal(y.name, y.note, y.price, y.keyword, 'edit')">Edit</button>
+    </ion-item>
+
+    <ion-item *ngIf="activeProducts.length !== 0">
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            Cost
+          </ion-col>
+          <ion-col style="text-align:right">
+            {{currentCost}}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+
+    <ion-item *ngFor="let x of inactiveProducts">
+      <div style="margin-right: 24px;" item-start>
+        <label class="cb-container">
+          <input type="checkbox" checked="true" (change)="setProductState($event, x.name)">
+          <span class="checkmark"></span>
+        </label>
+      </div>
+
+      <h2>
+        <del>{{x.name}}</del>
+      </h2>
+      <p *ngIf="x.note">
+        <del>{{x.note}}</del>
+      </p>
+      <p item-end *ngIf="x.price" style="margin-right:32px">
+        <del>Price: <span>{{x.price}}</span></del>
+      </p>
+    </ion-item>
+
+  </ion-list>
+
+  <div class="buttons">
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <button ion-button color="secondary" small (click)="showAddlistModal()">Add list</button>
+        </ion-col>
+        <ion-col>
+          <button ion-button color="danger" small (click)="deleteList()" *ngIf="activeProducts.length === 0 && inactiveProducts.length === 0 && selectedList !== 'Default'">
+            Delete list
+          </button>
+          <button ion-button color="danger" small (click)="showClearListModal()" *ngIf="activeProducts.length > 0 || inactiveProducts.length > 0">
+            Clear list
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button color="primary" small (click)="showMap()">Show map
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</div>
+
+<div class="footer">
+  <ion-list style="margin:0">
+    <ion-item style="background-color: #f5f5f5">
+      <ion-label>My lists</ion-label>
+      <ion-select [(ngModel)]="selectedList" #sel (ionChange)="selectList(sel.value)">
+        <ion-option *ngFor="let i of lists">{{i.name}}</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</div>
+
+<div class="modal" id="addListModal">
+  <div class="modal-content">
+    <ion-list>
+      <ion-item>
+        <ion-input type="text" value="" placeholder="Name" #list></ion-input>
+      </ion-item>
+      <ion-item>
+        <button ion-button color="secondary" (click)="addNewList(list.value)">Add</button>
+        <button ion-button clear (click)="closeAddlistModal()">Cancel</button>
+      </ion-item>
+    </ion-list>
+  </div>
+</div>
+
+<div class="modal" id="clearListModal">
+  <div class="modal-content">
+    <ion-list>
+      <ion-item>
+        <h3>Are you sure?</h3>
+      </ion-item>
+      <ion-item>
+        <button ion-button color="danger" (click)="clearList()">Clear</button>
+        <button ion-button clear (click)="closeClearListModal()">Cancel</button>
+      </ion-item>
+    </ion-list>
+  </div>
+</div>
+
+<div class="modal" id="locNetModal">
+  <div class="modal-content">
+   Enable location and internet connection
+  </div>
+</div>
